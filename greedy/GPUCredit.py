@@ -4,12 +4,19 @@ import heapq
 
 class Transaction:
     def __init__(self, grant_id: str, amount: int, timestamp: int, expire: int):
-        self.grant_id = grant_id
+        self.grant_id = grant_id # empty if subtraction
         self.amount = amount
         self.timestamp = timestamp
-        self.expire = expire
+        self.expire = expire # empty if subtraction
 
     def __lt__(self, other):
+        """
+        sort 
+        1. compare the expirations first
+        2. if the other has expiration, then this is less
+        3. if both have timestamp, then check it is subtraction, no grant
+        4. compare timestamps
+        """
         if self.expire is not None and other.expire is None:
             return True
         if self.expire is not None and other.expire is not None:
@@ -47,15 +54,18 @@ class GPUCredit:
         for transaction in sorted_filtered_transactions:
             last_timestamp = transaction.timestamp
 
+            # push all the additions
             if transaction.grant_id is not None:
                 heapq.heappush(balance, transaction)
 
             else:
+                # handle subtractions
                 subtract_amount = transaction.amount
 
                 while subtract_amount > 0:
                     credit = heapq.heappop(balance)
 
+                    # credit expires sooner, so it cannot be used
                     if credit.expire < transaction.timestamp:
                         continue
 
@@ -68,9 +78,11 @@ class GPUCredit:
                         # heapq.heappush(balance, Transaction(credit.grant_id, credit.amount - subtract_amount, credit.timestamp, credit.expire))
                         subtract_amount = 0
 
+        # for all expired credits, remove them
         while balance and timestamp >= balance[0].expire:
             heapq.heappop(balance)
 
+        # sum up all the remaining credits
         print(sum(map(lambda transaction: transaction.amount, balance)))
         return sum(map(lambda transaction: transaction.amount, balance))
 
@@ -81,11 +93,11 @@ gpu.get_balance(10) # value is None
 gpu.add('a', 4, 20, 30)
 gpu.get_balance(10) # value is 0
 gpu.get_balance(20) # value is 4
-gpu.get_balance(30) # value is 0
+print(gpu.get_balance(30)) # value is 0
  
 gpu = GPUCredit()
 gpu.add('a', 4, 20, 60)
 gpu.add('b', 3, 30, 40)
 gpu.subtract(2, 30)
 gpu.get_balance(30) # value is 5
-gpu.get_balance(40) # value is 4
+print(gpu.get_balance(40)) # value is 4
