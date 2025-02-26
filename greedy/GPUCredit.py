@@ -17,14 +17,21 @@ class Transaction:
         3. if both have timestamp, then check it is subtraction, no grant
         4. compare timestamps
         """
-        if self.expire is not None and other.expire is None:
-            return True
+        # addition, addition
         if self.expire is not None and other.expire is not None:
             return self.expire < other.expire
+            
+        # addition, subtraction
+        if self.expire is not None and other.expire is None:
+            return True
+
+        # subtraction, addition
         if self.timestamp == other.timestamp:
+            # addition is less
             return self.grant_id is not None
-        else:
-            return self.timestamp < other.timestamp
+
+        # subtraction, subtraction
+        return self.timestamp < other.timestamp
     
     def __repr__(self):
         return f"{self.grant_id}: {self.amount}"
@@ -38,44 +45,50 @@ class GPUCredit:
         self.transactions = []
 
     def add(self, grant_id: str, amount: int, timestamp: int, expire: int):
+        # additions have all info
         self.transactions.append(Transaction(grant_id, amount, timestamp, expire))
 
     def subtract(self, amount: int, timestamp: int):
+        # subtractions only have 2
         self.transactions.append(Transaction(None, amount, timestamp, None))
 
     def get_balance(self, timestamp: int) -> int:
         balance = []
 
+        # filter all of the transactions and filter by timestamp
+        # make a deepcopy because we are modifying the credits
         filtered_transactions = list(filter(lambda transaction: transaction.timestamp <= timestamp, copy.deepcopy(self.transactions)))
 
+        # sort transactions use the __lt__
         sorted_filtered_transactions = sorted(filtered_transactions)
 
+        # use min_heap get the balance
         heapq.heapify(balance)
         for transaction in sorted_filtered_transactions:
-            last_timestamp = transaction.timestamp
-
             # push all the additions
             if transaction.grant_id is not None:
                 heapq.heappush(balance, transaction)
-
             else:
                 # handle subtractions
                 subtract_amount = transaction.amount
 
+                # need to handle the subtract amounts
                 while subtract_amount > 0:
+                    # get the credit expiring first
                     credit = heapq.heappop(balance)
 
-                    # credit expires sooner, so it cannot be used
+                    # credit expired already, consume it
                     if credit.expire < transaction.timestamp:
                         continue
 
+                    # subtract is greater, then we consume the credit
                     if subtract_amount >= credit.amount:
                         subtract_amount -= credit.amount
-
-                    if subtract_amount < credit.amount:
+                    else:
+                        # subtract is smaller, update the credit and push it back
                         credit.amount -= subtract_amount
                         heapq.heappush(balance, credit)
-                        # heapq.heappush(balance, Transaction(credit.grant_id, credit.amount - subtract_amount, credit.timestamp, credit.expire))
+                        # subtract is completed
                         subtract_amount = 0
 
         # for all expired credits, remove them
