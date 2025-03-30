@@ -11,31 +11,24 @@ def print_level_by_level(root):
 
     current = root
     while current:
+        child = None
+
         # Traverse the current level using sibling pointers
         node = current
         while node:
+            # get the next child 
+            if not child and node.left:
+                child = node.left
+            if not child and node.right:
+                child = node.right
+
             print(node.val, end=" ")
             node = node.sibling
+        
         print()  # Move to the next line for the next level
 
-        # Move to the next level (find the leftmost node of the next level)
-        if current.left:
-            current = current.left
-        elif current.right:
-            current = current.right
-        else:
-            # Find the first child in the next level using sibling pointers
-            temp = current.sibling
-            while temp:
-                if temp.left:
-                    current = temp.left
-                    break
-                if temp.right:
-                    current = temp.right
-                    break
-                temp = temp.sibling
-            else:
-                break  # If no children found, we're done
+        # set current to child for next printing 
+        current = child
 
 # Example usage
 root = Node(1)
