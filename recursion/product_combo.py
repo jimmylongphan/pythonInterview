@@ -8,12 +8,7 @@ Given the below product categories, each combination should contain one product 
 NOTES:
   - Backtracking
   - recursive
-  - 
-
-
-dfs method(limit, current_balance, current_list, index_cat_1, index_cat_2, product_tuples_1, ...)
-
-
+  
 Have a list of tuples for each category
 
 [(MacBook air, 1249), ...]
