@@ -1,5 +1,5 @@
 """
-return  ['text','checkbox','text',integer']
+return  ['text','checkbox','text','integer']
 
 Assumptions
 Only 4 columns
