@@ -45,8 +45,8 @@ class Deck:
     shuffled: bool
     remaining: int
 
-
-BASE_URL = "https://www.deckofcardsapi.com/api"
+# need / at end for urljoin to work
+BASE_URL = "https://www.deckofcardsapi.com/api/"
 
 
 def get_new_deck() -> Deck:
