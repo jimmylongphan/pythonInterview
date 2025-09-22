@@ -1,0 +1,17 @@
+
+
+
+### Coding problem.
+
+Please implement a Merkle-tree in python, typescript, rust, or go with the following constraints:
+
+1. It should construct a merkle-tree on the cloned `postgres` repository.
+2. For $k$ files, you should only do $k$ `/upload` calls to the server.
+3. After you are done embedding, I will run a `modify.py` script that will randomly edit $m$ files in the repo. You are then to run the syncing process which is allowed $m$ `/upload` calls and $2m$ `/check` calls.
+4. In the final state, the `/check` for your root (`/`) should be the same as the hash when you call `/check` on `/` on the server.
+
+For the problem:
+
+
+1. you should implement both the client and the server.
+
