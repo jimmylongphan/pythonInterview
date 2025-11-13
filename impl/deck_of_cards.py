@@ -95,7 +95,7 @@ class Deck:
         # assumption, enough cards for the players
         total_needed = num_cards * len(players)
         if total_needed > len(self.cards):
-            raise "too many cards for each player"
+            raise Exception("too many cards for each player")
         
         for n in range(num_cards):
             for p in players:
