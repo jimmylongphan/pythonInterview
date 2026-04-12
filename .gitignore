@@ -171,4 +171,5 @@ cython_debug/
 .pypirc
 
 # Local Codex workspace state
+.codex
 .codex/
